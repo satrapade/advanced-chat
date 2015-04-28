@@ -4,8 +4,42 @@ var express = require('express')
 , io = require("socket.io").listen(server)
 , npid = require("npid")
 , uuid = require('node-uuid')
+, winston = require("winston")
 , Room = require('./room.js')
 , _ = require('underscore')._;
+
+
+// Pad n to specified size by prepending a zeros
+function zeroPad(num, size) {
+  var s = num + "";
+  while (s.length < size)
+    s = "0" + s;
+  return s;
+}
+
+var logger = new (winston.Logger)({
+  transports: [
+    new (winston.transports.Console)({
+      // Return the time as local YYYY-MM-DD HH:MM:SS
+      timestamp: function() {
+	var d = new Date();
+	return zeroPad(d.getFullYear()) + "-" +
+	  zeroPad(d.getMonth()) + "-" +
+	  zeroPad(d.getDate()) + " " +
+	  zeroPad(d.getHours(), 2) + ":" +
+	  zeroPad(d.getMinutes(), 2) + ":" +
+	  zeroPad(d.getSeconds(), 2);
+      },
+      formatter: function(options) {
+        // Return string will be passed to logger.
+        return options.timestamp() +' '+ options.level.toUpperCase() +' '+ (undefined !== options.message ? options.message : '') +
+          (options.meta && Object.keys(options.meta).length ? '\n\t'+ JSON.stringify(options.meta) : '' );
+      }
+    })
+  ]
+});
+
+logger.info('Data to log.');
 
 app.configure(function() {
 	app.set('port', process.env.OPENSHIFT_NODEJS_PORT || 3000);
