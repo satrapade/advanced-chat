@@ -5,6 +5,7 @@
   "main": "server.js",
   "dependencies": {
     "ejs": "~0.8.5",
+    "errno-codes": "~1.0.2",
     "express": "~3.4.8",
     "node-uuid": "~1.4.1",
     "nodemon": "~1.0.13",

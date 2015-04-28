@@ -1,13 +1,26 @@
 var express = require('express')
 , app = express()
+, fs = require('fs')
 , server = require('http').createServer(app)
 , io = require("socket.io").listen(server)
 , npid = require("npid")
 , uuid = require('node-uuid')
 , winston = require("winston")
+, Error = require('errno-codes')
 , Room = require('./room.js')
 , _ = require('underscore')._;
 
+
+// Initialize logging
+
+var logDir = '/var/log/advanced-chat';
+
+try {
+  fs.mkdirSync(logDir, 0700);
+} catch (err) {
+  if (err.errno != Error.EEXIST.errno)
+    throw(err);
+}
 
 // Pad n to specified size by prepending a zeros
 function zeroPad(num, size) {
@@ -19,7 +32,7 @@ function zeroPad(num, size) {
 
 var logger = new (winston.Logger)({
   transports: [
-    new (winston.transports.Console)({
+    new (winston.transports.File)({
       // Return the time as local YYYY-MM-DD HH:MM:SS
       timestamp: function() {
 	var d = new Date();
@@ -34,8 +47,11 @@ var logger = new (winston.Logger)({
         // Return string will be passed to logger.
         return options.timestamp() +' '+ options.level.toUpperCase() +' '+ (undefined !== options.message ? options.message : '') +
           (options.meta && Object.keys(options.meta).length ? '\n\t'+ JSON.stringify(options.meta) : '' );
-      }
-    })
+      },
+      filename: logDir + '/chat.log',
+      json: false
+    }),
+    new (winston.transports.Console)(),
   ]
 });
 
