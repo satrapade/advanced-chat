@@ -1580,6 +1580,41 @@
           "from": "p-throttler@~0.0.1"
         }
       }
+    },
+    "winston": {
+      "version": "1.0.0",
+      "from": "winston@",
+      "resolved": "https://registry.npmjs.org/winston/-/winston-1.0.0.tgz",
+      "dependencies": {
+        "async": {
+          "version": "0.9.0",
+          "from": "async@0.9.x"
+        },
+        "colors": {
+          "version": "1.0.3",
+          "from": "colors@1.0.x"
+        },
+        "cycle": {
+          "version": "1.0.3",
+          "from": "cycle@1.0.x"
+        },
+        "eyes": {
+          "version": "0.1.8",
+          "from": "eyes@0.1.x"
+        },
+        "isstream": {
+          "version": "0.1.2",
+          "from": "isstream@0.1.x"
+        },
+        "pkginfo": {
+          "version": "0.3.0",
+          "from": "pkginfo@0.3.x"
+        },
+        "stack-trace": {
+          "version": "0.0.9",
+          "from": "stack-trace@0.0.x"
+        }
+      }
     }
   }
 }
