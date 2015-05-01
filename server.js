@@ -4,6 +4,7 @@ var express = require('express')
 , server = require('http').createServer(app)
 , io = require("socket.io").listen(server)
 , npid = require("npid")
+, util = require("util")
 , uuid = require('node-uuid')
 , winston = require("winston")
 , Error = require('errno-codes')
@@ -49,7 +50,8 @@ var logger = new (winston.Logger)({
           (options.meta && Object.keys(options.meta).length ? '\n\t'+ JSON.stringify(options.meta) : '' );
       },
       filename: logDir + '/chat.log',
-      json: false
+      json: false,
+      level: 'verbose',
     }),
     new (winston.transports.Console)(),
   ]
@@ -235,14 +237,32 @@ function purge(s, action) {
 
 io.sockets.on("connection", function (socket) {
 
+	// Note that for unauthenticated sessions the following can be faked
+	var remoteUser = socket.handshake.headers['x-remote-user'];
+	if (remoteUser) {
+		logger.info('Authenticated connection: ' + remoteUser);
+		socket.emit("remoteUser", remoteUser);
+	} else
+		socket.emit("noRemoteUser");
+
+
 	socket.on("joinserver", function(name, device) {
 		var exists = false;
 		var ownerRoomID = inRoomID = null;
 
 		_.find(people, function(key,value) {
 			if (key.name.toLowerCase() === name.toLowerCase())
-				return exists = true;
+				// Authenticated users can't exist more than once
+				if (remoteUser) {
+					logger.info('Disconnect previous connection: ' + key.name);
+					var s = _.findWhere(sockets, {'id': value});
+					purge(s, "disconnect");
+					return exists = false;
+				} else {
+					return exists = true;
+				}
 		});
+
 		if (exists) {//provide unique username:
 			var randomNumber=Math.floor(Math.random()*1001)
 			do {

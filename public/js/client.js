@@ -63,6 +63,17 @@ function toggleChatWindow() {
   $("#main-chat-screen").toggle();
 }
 
+function toggleLoadingMessage() {
+  $("#loading").toggle();
+}
+
+function getDevice() {
+  if (navigator.userAgent.match(/Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile/i))
+    return "mobile";
+  else
+    return "desktop";
+}
+
 // Pad n to specified size by prepending a zeros
 function zeroPad(num, size) {
   var s = num + "";
@@ -94,11 +105,14 @@ $(document).ready(function() {
       });
   });
 
+  $("#loading").show();
+  $("#login-screen").hide();
   $("#main-chat-screen").hide();
   $("#errors").hide();
   $("#name").focus();
   $("#join").attr('disabled', 'disabled'); 
   
+
   if ($("#name").val() === "") {
     $("#join").attr('disabled', 'disabled');
   }
@@ -106,10 +120,7 @@ $(document).ready(function() {
   //enter screen
   $("#nameForm").submit(function() {
     var name = $("#name").val();
-    var device = "desktop";
-    if (navigator.userAgent.match(/Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile/i)) {
-      device = "mobile";
-    }
+    var device = getDevice();
     if (name === "" || name.length < 2) {
       $("#errors").empty();
       $("#errors").append("Please enter a name");
@@ -402,6 +413,23 @@ socket.on("history", function(data) {
 
   socket.on("sendRoomID", function(data) {
     myRoomID = data.id;
+  });
+
+  // Called at the beginning of a session if the remote user is known
+  // at the server end, typically through authentication.
+  socket.on("remoteUser", function(name) {
+    console.log("remoteUser: " + name);
+    var device = getDevice();
+    socket.emit("joinserver", name, device);
+    toggleLoadingMessage();
+    toggleChatWindow();
+    $("#msg").focus();
+  });
+
+  // Called at the beginning of a session if the remote user is not known
+  socket.on("noRemoteUser", function(name) {
+    toggleLoadingMessage();
+    toggleNameForm();
   });
 
   socket.on("disconnect", function(){
