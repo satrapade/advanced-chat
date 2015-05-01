@@ -327,12 +327,14 @@ io.sockets.on("connection", function (socket) {
 				var whisperMsg = whisperStr[2];
 				socket.emit("whisper", {name: "You"}, whisperMsg);
 				io.sockets.socket(whisperId).emit("whisper", msTime, people[socket.id], whisperMsg);
+				logger.verbose('whispet user: ' + people[socket.id].name + ' to: ' + whisperTo + " message: " + msg);
 			} else {
 				socket.emit("update", "Can't find " + whisperTo);
 			}
 		} else {
 			if (io.sockets.manager.roomClients[socket.id]['/'+socket.room] !== undefined ) {
 				io.sockets.in(socket.room).emit("chat", msTime, people[socket.id], msg);
+				logger.verbose('chat user: ' + people[socket.id].name + ' room: ' + rooms[people[socket.id].inroom].name + " message: " + msg);
 				socket.emit("isTyping", false);
 				if (_.size(chatHistory[socket.room]) > 10) {
 					chatHistory[socket.room].splice(0,1);
