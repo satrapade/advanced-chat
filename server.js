@@ -37,9 +37,9 @@ var logger = new (winston.Logger)({
       // Return the time as local YYYY-MM-DD HH:MM:SS
       timestamp: function() {
 	var d = new Date();
-	return zeroPad(d.getFullYear()) + "-" +
-	  zeroPad(d.getMonth()) + "-" +
-	  zeroPad(d.getDate()) + " " +
+	return d.getFullYear() + "-" +
+	  zeroPad(d.getMonth() + 1, 2) + "-" +
+	  zeroPad(d.getDate(), 2) + " " +
 	  zeroPad(d.getHours(), 2) + ":" +
 	  zeroPad(d.getMinutes(), 2) + ":" +
 	  zeroPad(d.getSeconds(), 2);
