@@ -33,7 +33,8 @@ function zeroPad(num, size) {
 
 var logger = new (winston.Logger)({
   transports: [
-    new (winston.transports.File)({
+    // File transport with rotation
+    new (winston.transports.DailyRotateFile)({
       // Return the time as local YYYY-MM-DD HH:MM:SS
       timestamp: function() {
 	var d = new Date();
