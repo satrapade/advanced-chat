@@ -326,7 +326,7 @@ io.sockets.on("connection", function (socket) {
 			if (found && socket.id !== whisperId) {
 				var whisperTo = whisperStr[1];
 				var whisperMsg = whisperStr[2];
-				socket.emit("whisper", {name: "You"}, whisperMsg);
+				socket.emit("whisper", msTime, {name: "You"}, whisperMsg);
 				io.sockets.socket(whisperId).emit("whisper", msTime, people[socket.id], whisperMsg);
 				logger.verbose('whispet user: ' + people[socket.id].name + ' to: ' + whisperTo + " message: " + msg);
 			} else {
